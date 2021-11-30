@@ -1,13 +1,14 @@
 package main
 
 import (
-	"github.com/jfrog/jfrog-cli-core/v2/plugins"
 	"github.com/jfrog/jfrog-cli-core/v2/plugins/components"
-	"github.com/jfrog/jfrog-cli-plugin-template/commands"
+	"github.com/jfrog/jfrog-cli-platform-advisor/commands"
+	"github.com/jfrog/jfrog-cli-platform-advisor/inputs"
 )
 
 func main() {
-	plugins.PluginMain(getApp())
+	inputs.GetConfig()
+	// plugins.PluginMain(getApp())
 }
 
 func getApp() components.App {
