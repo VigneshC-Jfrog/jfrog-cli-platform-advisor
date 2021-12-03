@@ -1,22 +1,46 @@
 package commands
 
 import (
-	"errors"
+	"encoding/base64"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 
 	"github.com/jfrog/jfrog-cli-platform-advisor/inputs"
 )
 
+type HttpRequest struct {
+	ReqType  string
+	ReqUrl   string
+	AuthUser string
+	AuthPass string
+}
+
+type Repo struct {
+	Key          string   `json:"key"`
+	Repositories []string `json:"repositories"`
+}
+
+func MakeHTTPCall(httpRequest HttpRequest) []byte {
+	client := &http.Client{}
+	req, _ := http.NewRequest("GET", httpRequest.ReqUrl, nil)
+	req.Header.Add("Authorization", "Basic "+basicAuth(httpRequest.AuthUser, httpRequest.AuthPass))
+	resp, _ := client.Do(req)
+	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusOK {
+		bodyBytes, _ := ioutil.ReadAll(resp.Body)
+		return []byte(bodyBytes)
+	}
+	return nil
+}
+
+func basicAuth(username, password string) string {
+	auth := username + ":" + password
+	return base64.StdEncoding.EncodeToString([]byte(auth))
+}
+
 func securityAdvisory() error {
-	var config_xml = inputs.GetConfig()
-	if config_xml.Security.AnonAccess == "" {
-		return errors.New("Cannot fetch anonymous access flag fro config.xml")
-	}
-	if config_xml.Security.AnonAccess == "false" {
-		fmt.Println("Anonymous access is disabled. You are safe!")
-		return nil
-	} else {
-		fmt.Println("Anonymous access is enabled. Advise to disable it if the instance is publically accessible")
-		return nil
-	}
+	var output = inputs.GetConfig()
+	fmt.Println(output)
+	return nil
 }

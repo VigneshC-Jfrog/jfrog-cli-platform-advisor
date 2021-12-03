@@ -2,9 +2,11 @@ package commands
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 
 	"github.com/jfrog/jfrog-cli-core/v2/plugins/components"
+	"github.com/jfrog/jfrog-cli-platform-advisor/model"
 )
 
 func GetAdvisory() components.Command {
@@ -40,7 +42,11 @@ func getAdvisory(c *components.Context) error {
 	if advisoryType == "security" {
 		return securityAdvisory()
 	} else if advisoryType == "performance" {
-		return performanceAdvisory()
+		fmt.Println("Running performance check")
+		for index, advise := range model.GetPerformanceAdvises() {
+			fmt.Println("Running condition ", index, advise.AdvisoryName, "Result: ", advise.Condition())
+		}
+		return nil
 	} else {
 		return errors.New("Sub command not supported")
 	}
