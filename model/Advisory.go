@@ -1,10 +1,12 @@
 package model
 
-type Condition func() bool
+type AbstractAdvisory interface {
+	AdvisoryInfo() AdvisoryInfo
+	Condition() bool
+}
 
-type Adivsory struct {
+type AdvisoryInfo struct {
 	AdvisoryName string
 	AdvisoryType string
 	Severity     int
-	Condition    Condition
 }

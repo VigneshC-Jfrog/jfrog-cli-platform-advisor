@@ -22,7 +22,10 @@ func MakeHTTPCall(httpRequest HttpRequest) []byte {
 	client := &http.Client{}
 	req, _ := http.NewRequest("GET", httpRequest.ReqUrl, nil)
 	req.Header.Add("Authorization", "Basic "+basicAuth(httpRequest.AuthUser, httpRequest.AuthPass))
-	resp, _ := client.Do(req)
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil
+	}
 	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusOK {
 		bodyBytes, _ := ioutil.ReadAll(resp.Body)

@@ -1,4 +1,4 @@
-package commands
+package controller
 
 import (
 	"errors"
@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/jfrog/jfrog-cli-core/v2/plugins/components"
-	"github.com/jfrog/jfrog-cli-platform-advisor/model"
 )
 
 func GetAdvisory() components.Command {
@@ -40,14 +39,17 @@ func getAdvisory(c *components.Context) error {
 	}
 	var advisoryType = c.Arguments[0]
 	if advisoryType == "security" {
-		return securityAdvisory()
+		for index, advise := range GetSecurityAdvises() {
+			fmt.Println("Running condition ", index, advise.AdvisoryInfo().AdvisoryName, "Result: ", advise.Condition())
+		}
 	} else if advisoryType == "performance" {
 		fmt.Println("Running performance check")
-		for index, advise := range model.GetPerformanceAdvises() {
-			fmt.Println("Running condition ", index, advise.AdvisoryName, "Result: ", advise.Condition())
+		for index, advise := range GetPerformanceAdvises() {
+			fmt.Println("Running condition ", index, advise.AdvisoryInfo().AdvisoryName, "Result: ", advise.Condition())
 		}
 		return nil
 	} else {
 		return errors.New("Sub command not supported")
 	}
+	return nil
 }

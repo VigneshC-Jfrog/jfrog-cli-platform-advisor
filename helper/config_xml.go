@@ -1,4 +1,4 @@
-package inputs
+package helper
 
 import (
 	"encoding/xml"
@@ -6,17 +6,22 @@ import (
 
 	"github.com/jfrog/jfrog-cli-core/v2/common/commands"
 	"github.com/jfrog/jfrog-cli-platform-advisor/common"
+	"github.com/jfrog/jfrog-cli-platform-advisor/model"
 )
 
-var config_xml = new(Config)
+var config_xml = new(model.Config)
 
-type Config struct {
-	XMLName  xml.Name `xml:"config"`
-	Security Security `xml:"security"`
-}
+func GetConfig() model.Config {
+	fmt.Println("Getting config xml")
+	if config_xml.Security.AnonAccess == "" {
+		fmt.Println("No config xml data found retrieving it")
+		data, _ := getConfigXml()
+		config := &model.Config{}
 
-type Security struct {
-	AnonAccess string `xml:"anonAccessEnabled"`
+		_ = xml.Unmarshal(data, &config)
+		config_xml = config
+	}
+	return *config_xml
 }
 
 func getConfigXml() ([]byte, error) {
@@ -28,17 +33,4 @@ func getConfigXml() ([]byte, error) {
 		httpRequest := &common.HttpRequest{ReqUrl: url, ReqType: "GET", AuthUser: serverDetails.GetUser(), AuthPass: serverDetails.GetPassword()}
 		return common.MakeHTTPCall(*httpRequest), nil
 	}
-}
-
-func GetConfig() Config {
-	fmt.Println("Getting config xml")
-	if config_xml.Security.AnonAccess == "" {
-		fmt.Println("No config xml data found retrieving it")
-		data, _ := getConfigXml()
-		config := &Config{}
-
-		_ = xml.Unmarshal(data, &config)
-		config_xml = config
-	}
-	return *config_xml
 }
