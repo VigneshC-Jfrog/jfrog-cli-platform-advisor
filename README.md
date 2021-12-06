@@ -1,8 +1,7 @@
-# hello-frog
+# platform-advisor
 
 ## About this plugin
-This plugin is a template and a functioning example for a basic JFrog CLI plugin. 
-This README shows the expected structure of your plugin's README.
+This plugin will analyse the JFrog Platform instance and provide the non conformance against the best practices based on the predefines rules.
 
 ## Installation with JFrog CLI
 Installing the latest version:
