@@ -4,6 +4,8 @@ import (
 	"encoding/base64"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/fatih/color"
 )
 
 type HttpRequest struct {
@@ -32,4 +34,16 @@ func MakeHTTPCall(httpRequest HttpRequest) []byte {
 		return []byte(bodyBytes)
 	}
 	return nil
+}
+
+func GetColor(condition bool, message string) {
+
+	if condition == true {
+		red := color.New(color.FgGreen)
+		red.Println(message)
+	} else {
+		red := color.New(color.FgRed)
+		red.Println(message)
+	}
+
 }

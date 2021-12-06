@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	sgr "github.com/foize/go.sgr"
 	"github.com/jfrog/jfrog-cli-core/v2/plugins/components"
 )
 
@@ -30,6 +31,10 @@ func getAdvisoryArguments() []components.Argument {
 			Name:        "performance",
 			Description: "Search for performance advises",
 		},
+		{
+			Name:        "all",
+			Description: "Search for all advises",
+		},
 	}
 }
 
@@ -37,13 +42,29 @@ func getAdvisory(c *components.Context) error {
 	if len(c.Arguments) != 1 {
 		return errors.New("Wrong number of arguments. Expected: 1, " + "Received: " + strconv.Itoa(len(c.Arguments)))
 	}
+
 	var advisoryType = c.Arguments[0]
 	if advisoryType == "security" {
+		fmt.Printf(sgr.MustParseln("[underline]%s"), "SECURITY REPORTS")
 		for index, advise := range GetSecurityAdvises() {
+
 			fmt.Println("Running condition ", index, advise.AdvisoryInfo().AdvisoryName, "Result: ", advise.Condition())
 		}
 	} else if advisoryType == "performance" {
-		fmt.Println("Running performance check")
+		fmt.Printf(sgr.MustParseln("[underline]%s"), "PERFORMANCE REPORTS")
+		for index, advise := range GetPerformanceAdvises() {
+			fmt.Println("Running condition ", index, advise.AdvisoryInfo().AdvisoryName, "Result: ", advise.Condition())
+		}
+		return nil
+	} else if advisoryType == "all" {
+		fmt.Printf(sgr.MustParseln("[underline]%s"), "SECURITY REPORTS")
+		fmt.Println("")
+		for index, advise := range GetSecurityAdvises() {
+
+			fmt.Println("Running condition ", index, advise.AdvisoryInfo().AdvisoryName, "Result: ", advise.Condition())
+		}
+		fmt.Println("")
+		fmt.Printf(sgr.MustParseln("[underline]%s"), "PERFORMANCE REPORTS")
 		for index, advise := range GetPerformanceAdvises() {
 			fmt.Println("Running condition ", index, advise.AdvisoryInfo().AdvisoryName, "Result: ", advise.Condition())
 		}

@@ -2,7 +2,6 @@ package helper
 
 import (
 	"encoding/xml"
-	"fmt"
 
 	"github.com/jfrog/jfrog-cli-core/v2/common/commands"
 	"github.com/jfrog/jfrog-cli-platform-advisor/common"
@@ -12,9 +11,8 @@ import (
 var config_xml = new(model.Config)
 
 func GetConfig() model.Config {
-	fmt.Println("Getting config xml")
 	if config_xml.Security.AnonAccess == "" {
-		fmt.Println("No config xml data found retrieving it")
+
 		data, _ := getConfigXml()
 		config := &model.Config{}
 

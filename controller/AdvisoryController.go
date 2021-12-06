@@ -13,5 +13,5 @@ func GetSecurityAdvises() []model.AbstractAdvisory {
 func GetPerformanceAdvises() []model.AbstractAdvisory {
 	return []model.AbstractAdvisory{
 		performance.HighStorageSummaryPerRepo{},
-		performance.HighVirualRepositoryAssociation{}}
+		performance.HighVirtualRepositoryAssociation{}}
 }

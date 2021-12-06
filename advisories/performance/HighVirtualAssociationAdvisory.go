@@ -2,21 +2,24 @@ package advisories
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
 
+	"github.com/gookit/color"
 	"github.com/jfrog/jfrog-cli-core/v2/common/commands"
 	"github.com/jfrog/jfrog-cli-platform-advisor/common"
 	"github.com/jfrog/jfrog-cli-platform-advisor/model"
 )
 
-type HighVirualRepositoryAssociation struct{}
+type HighVirtualRepositoryAssociation struct{}
 
-func (virutalRepoAssociation HighVirualRepositoryAssociation) AdvisoryInfo() model.AdvisoryInfo {
-	return model.AdvisoryInfo{AdvisoryName: "HighVirualRepositoryAssociation", AdvisoryType: "performance", Severity: 2}
+func (virutalRepoAssociation HighVirtualRepositoryAssociation) AdvisoryInfo() model.AdvisoryInfo {
+	return model.AdvisoryInfo{AdvisoryName: "HighVirtualRepositoryAssociation", AdvisoryType: "performance", Severity: 2}
 }
 
-func (virutalRepoAssociation HighVirualRepositoryAssociation) Condition() bool {
+func (virutalRepoAssociation HighVirtualRepositoryAssociation) Condition() bool {
+	println("")
+	color.RGB(35, 155, 240).Println("High Virtual Summary Per Repo ...........")
+	println("")
 	serverDetails, err := commands.NewCurlCommand().GetServerDetails()
 	if err != nil {
 		return false
@@ -33,11 +36,13 @@ func (virutalRepoAssociation HighVirualRepositoryAssociation) Condition() bool {
 		var response = common.MakeHTTPCall(*httpRequest)
 		var repo model.Repo
 		json.Unmarshal(response, &repo)
-		if len(repo.Repositories) > 4 {
+		if len(repo.Repositories) > 2 {
 			result = false
-			fmt.Println(strconv.Itoa(len(repo.Repositories)) + " are mapped to virtual repository " + repo.Key + " Consider splitting it.")
+			var message string = string("• " + strconv.Itoa(len(repo.Repositories)) + " are mapped to virtual repository " + repo.Key + " Consider splitting it.")
+			common.GetColor(result, message)
 		} else if len(repo.Repositories) == 0 {
-			fmt.Println("No repositories mapped to virtual repository " + repo.Key + " Consider adding one or delete this virtual repository")
+			var message string = string("• No repositories mapped to virtual repository " + repo.Key + " Consider adding one or delete this virtual repository")
+			common.GetColor(result, message)
 		}
 	}
 	return result
