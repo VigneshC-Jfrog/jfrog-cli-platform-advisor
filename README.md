@@ -1,7 +1,7 @@
 # platform-advisor
 
 ## About this plugin
-This plugin will analyse the JFrog Platform instance and provide the non conformance against the best practices based on the predefines rules.
+This plugin will analyse the JFrog Platform instance and provide the non conformance against the best practices based on the predefined rules.
 
 ## Installation with JFrog CLI
 Installing the latest version:
