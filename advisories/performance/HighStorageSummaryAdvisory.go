@@ -39,8 +39,11 @@ func (highStorageSummaryPerRepo HighStorageSummaryPerRepo) Condition() bool {
 			result = false
 			var message string = "• Repository " + storageSummary.Repo[i].RepoKey + " has " + storageSummary.Repo[i].UsedSpace + ". Please split the content to different repositories."
 			common.GetColor(result, message)
+
 			My_map[storageSummary.Repo[i].RepoKey+"("+size_type+")"] = used_size
+
 		}
 	}
+	common.GetSummaryView(My_map)
 	return result
 }
