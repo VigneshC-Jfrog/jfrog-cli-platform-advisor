@@ -6,15 +6,15 @@ This plugin will analyse the JFrog Platform instance and provide the non conform
 ## Installation with JFrog CLI
 Installing the latest version:
 
-`$ jfrog plugin install hello-frog`
+`$ jfrog plugin install platform-advisor`
 
 Installing a specific version:
 
-`$ jfrog plugin install hello-frog@version`
+`$ jfrog plugin install platform-advisor@version`
 
 Uninstalling a plugin
 
-`$ jfrog plugin uninstall hello-frog`
+`$ jfrog plugin uninstall platform-advisor`
 
 ## Usage
 ### Commands
