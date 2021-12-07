@@ -4,10 +4,19 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 
 	sgr "github.com/foize/go.sgr"
 	"github.com/jfrog/jfrog-cli-core/v2/plugins/components"
+	"github.com/jfrog/jfrog-cli-core/v2/utils/config"
+	"github.com/jfrog/jfrog-cli-platform-advisor/common"
+	"github.com/jfrog/jfrog-cli-platform-advisor/model"
 )
+
+var advisory_map = map[string][]model.AbstractAdvisory{
+	"performance": GetPerformanceAdvises(),
+	"security":    GetSecurityAdvises(),
+	"all":         append(GetPerformanceAdvises(), GetSecurityAdvises()...)}
 
 func GetAdvisory() components.Command {
 	return components.Command{
@@ -15,6 +24,7 @@ func GetAdvisory() components.Command {
 		Description: "Provides advise related to security",
 		Aliases:     []string{"adv"},
 		Arguments:   getAdvisoryArguments(),
+		Flags:       getCommonFlags(),
 		Action: func(c *components.Context) error {
 			return getAdvisory(c)
 		},
@@ -38,39 +48,32 @@ func getAdvisoryArguments() []components.Argument {
 	}
 }
 
+func getCommonFlags() []components.Flag {
+	return []components.Flag{
+		components.StringFlag{
+			Name:         "server-id",
+			Description:  "Server ID for which advisory is sought.",
+			DefaultValue: "",
+		},
+	}
+}
+
 func getAdvisory(c *components.Context) error {
 	if len(c.Arguments) != 1 {
 		return errors.New("Wrong number of arguments. Expected: 1, " + "Received: " + strconv.Itoa(len(c.Arguments)))
 	}
-
 	var advisoryType = c.Arguments[0]
-	if advisoryType == "security" {
-		fmt.Printf(sgr.MustParseln("[underline]%s"), "SECURITY REPORTS")
-		for index, advise := range GetSecurityAdvises() {
-
-			fmt.Println("Running condition ", index, advise.AdvisoryInfo().AdvisoryName, "Result: ", advise.Condition())
-		}
-	} else if advisoryType == "performance" {
-		fmt.Printf(sgr.MustParseln("[underline]%s"), "PERFORMANCE REPORTS")
-		for index, advise := range GetPerformanceAdvises() {
-			fmt.Println("Running condition ", index, advise.AdvisoryInfo().AdvisoryName, "Result: ", advise.Condition())
-		}
-		return nil
-	} else if advisoryType == "all" {
-		fmt.Printf(sgr.MustParseln("[underline]%s"), "SECURITY REPORTS")
-		fmt.Println("")
-		for index, advise := range GetSecurityAdvises() {
-
-			fmt.Println("Running condition ", index, advise.AdvisoryInfo().AdvisoryName, "Result: ", advise.Condition())
-		}
-		fmt.Println("")
-		fmt.Printf(sgr.MustParseln("[underline]%s"), "PERFORMANCE REPORTS")
-		for index, advise := range GetPerformanceAdvises() {
-			fmt.Println("Running condition ", index, advise.AdvisoryInfo().AdvisoryName, "Result: ", advise.Condition())
-		}
-		return nil
-	} else {
+	serverIdValue := c.GetStringFlagValue("server-id")
+	serverDetails, _ := config.GetSpecificConfig(serverIdValue, true, true)
+	if advisory_map[advisoryType] == nil {
 		return errors.New("Sub command not supported")
+	}
+	fmt.Printf(sgr.MustParseln("[underline]%s"), strings.ToUpper(advisoryType)+" REPORTS\n")
+	for _, advise := range advisory_map[advisoryType] {
+		common.AddConsoleMsg("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n", "default")
+		common.AddConsoleMsg("Condition : "+advise.AdvisoryInfo().AdvisoryName+" Type: "+advise.AdvisoryInfo().AdvisoryType+"\n", "info")
+		advise.Condition(serverDetails)
+		common.AddConsoleMsg("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n", "default")
 	}
 	return nil
 }

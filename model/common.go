@@ -21,3 +21,16 @@ type Config struct {
 type Security struct {
 	AnonAccess string `xml:"anonAccessEnabled"`
 }
+
+type ConditionStatus struct {
+	StatusString string
+	Status       bool
+}
+
+type User struct {
+	Name  string
+	Uri   string
+	Realm string
+	Email string
+	Admin bool
+}

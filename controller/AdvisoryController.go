@@ -7,7 +7,10 @@ import (
 )
 
 func GetSecurityAdvises() []model.AbstractAdvisory {
-	return []model.AbstractAdvisory{security.IsAnonAccessEnabled{}}
+	return []model.AbstractAdvisory{
+		security.IsAnonAccessEnabled{},
+		security.IsPasswordExpirationEnabled{},
+		security.IsEmailAssociatedToAllUsers{}}
 }
 
 func GetPerformanceAdvises() []model.AbstractAdvisory {

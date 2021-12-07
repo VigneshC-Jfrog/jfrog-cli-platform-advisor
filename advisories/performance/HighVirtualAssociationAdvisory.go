@@ -3,9 +3,9 @@ package advisories
 import (
 	"encoding/json"
 	"strconv"
+	"strings"
 
-	"github.com/gookit/color"
-	"github.com/jfrog/jfrog-cli-core/v2/common/commands"
+	"github.com/jfrog/jfrog-cli-core/v2/utils/config"
 	"github.com/jfrog/jfrog-cli-platform-advisor/common"
 	"github.com/jfrog/jfrog-cli-platform-advisor/model"
 )
@@ -16,15 +16,7 @@ func (virutalRepoAssociation HighVirtualRepositoryAssociation) AdvisoryInfo() mo
 	return model.AdvisoryInfo{AdvisoryName: "HighVirtualRepositoryAssociation", AdvisoryType: "performance", Severity: 2}
 }
 
-func (virutalRepoAssociation HighVirtualRepositoryAssociation) Condition() bool {
-	println("")
-	color.RGB(35, 155, 240).Println("High Virtual Summary Per Repo ...........")
-	println("")
-	serverDetails, err := commands.NewCurlCommand().GetServerDetails()
-	if err != nil {
-		return false
-	}
-	var result bool = true
+func (virutalRepoAssociation HighVirtualRepositoryAssociation) Condition(serverDetails *config.ServerDetails) {
 	var repos []model.Repo
 	url := serverDetails.GetArtifactoryUrl() + "api/repositories?type=virtual"
 	httpRequest := &common.HttpRequest{ReqUrl: url, ReqType: "GET", AuthUser: serverDetails.GetUser(), AuthPass: serverDetails.GetPassword()}
@@ -32,18 +24,18 @@ func (virutalRepoAssociation HighVirtualRepositoryAssociation) Condition() bool 
 	json.Unmarshal(response, &repos)
 	for i := 0; i < len(repos); i++ {
 		var url = serverDetails.GetArtifactoryUrl() + "api/repositories/" + repos[i].Key
+		var status string
 		httpRequest := &common.HttpRequest{ReqUrl: url, ReqType: "GET", AuthUser: serverDetails.GetUser(), AuthPass: serverDetails.GetPassword()}
 		var response = common.MakeHTTPCall(*httpRequest)
 		var repo model.Repo
 		json.Unmarshal(response, &repo)
 		if len(repo.Repositories) > 2 {
-			result = false
-			var message string = string("• " + strconv.Itoa(len(repo.Repositories)) + " are mapped to virtual repository " + repo.Key + " Consider splitting it.")
-			common.GetColor(result, message)
+			status = string("• " + strconv.Itoa(len(repo.Repositories)) + " repos [" +
+				strings.Join(repo.Repositories, ",") + "] are mapped to virtual repository " + repo.Key + " Consider splitting it.\n")
+			common.AddConsoleMsg(status, "warn")
 		} else if len(repo.Repositories) == 0 {
-			var message string = string("• No repositories mapped to virtual repository " + repo.Key + " Consider adding one or delete this virtual repository")
-			common.GetColor(result, message)
+			status = string("• No repositories mapped to virtual repository " + repo.Key + " Consider adding one or delete this virtual repository\n")
+			common.AddConsoleMsg(status, "fatal")
 		}
 	}
-	return result
 }

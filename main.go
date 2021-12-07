@@ -15,12 +15,17 @@ func getApp() components.App {
 	app := components.App{}
 	app.Name = "platform-advisor"
 	app.Description = "Advises JFrog platform best practises"
-	app.Version = "v1.0.0"
+	app.Version = "v1.1.0"
 	app.Commands = getCommands()
 	return app
 }
 
 func getCommands() []components.Command {
+	printBanner()
+	return []components.Command{controller.GetAdvisory()}
+}
+
+func printBanner() {
 	println("")
 	println("")
 	pterm.DefaultBigText.WithLetters(
@@ -29,6 +34,4 @@ func getCommands() []components.Command {
 		Render()
 	println("")
 	println("")
-
-	return []components.Command{controller.GetAdvisory()}
 }

@@ -2,14 +2,17 @@ package common
 
 import (
 	"encoding/base64"
-	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
+	"time"
 
-	"github.com/fatih/color"
+	"github.com/gookit/color"
 	"github.com/wcharczuk/go-chart/v2"
 )
+
+var colour_map = map[string]color.Color{"info": color.FgLightBlue, "warn": color.FgYellow, "fatal": color.FgRed, "success": color.FgGreen, "default": color.White}
 
 type HttpRequest struct {
 	ReqType  string
@@ -35,44 +38,35 @@ func MakeHTTPCall(httpRequest HttpRequest) []byte {
 	if resp.StatusCode == http.StatusOK {
 		bodyBytes, _ := ioutil.ReadAll(resp.Body)
 		return []byte(bodyBytes)
+	} else {
+		log.Fatal("Error making REST call to url " + httpRequest.ReqUrl + " with response " + resp.Status)
 	}
 	return nil
 }
 
-func GetColor(condition bool, message string) {
-
-	if condition == true {
-		red := color.New(color.FgGreen)
-		red.Println(message)
-	} else {
-		red := color.New(color.FgRed)
-		red.Println(message)
-	}
-
-}
-
-func GetSummaryView(summarymap map[string]float64) {
-	const WarningColor = "\033[1;33m%s\033[0m"
+func GetSummaryView(summarymap map[string]float64, title, file_name string) {
 	var values []chart.Value
 	for l, v := range summarymap {
 		values = append(values, chart.Value{Label: l, Value: float64(v)})
 	}
 	graph := chart.BarChart{
-		Title: "High Storage Summary Per Repo Report",
+		Title: title,
 		Background: chart.Style{
 			Padding: chart.Box{
 				Top: 40,
 			},
 		},
 		Height:   512,
-		BarWidth: 60,
+		BarWidth: 200,
 		Bars:     values,
 	}
-	fmt.Printf(WarningColor, "High Storage Summary Per Repo Report.....")
-	fmt.Println("")
-	f, _ := os.Create("summary_report.png")
-	fmt.Printf(WarningColor, "High Storage Summary Per Repo Report created === summary_report.png ")
-	fmt.Println("")
+	f, _ := os.Create(file_name)
 	defer f.Close()
 	graph.Render(chart.PNG, f)
+	AddConsoleMsg("File created: "+file_name+"\n", "info")
+}
+
+func AddConsoleMsg(message string, level string) {
+	decor_print := color.New(colour_map[level])
+	decor_print.Println(time.Now().Format("01-02-2006 15:04:05") + "\t" + message)
 }
