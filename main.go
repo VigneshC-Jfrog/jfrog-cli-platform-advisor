@@ -4,7 +4,6 @@ import (
 	"github.com/jfrog/jfrog-cli-core/v2/plugins"
 	"github.com/jfrog/jfrog-cli-core/v2/plugins/components"
 	"github.com/jfrog/jfrog-cli-platform-advisor/controller"
-	"github.com/pterm/pterm"
 )
 
 func main() {
@@ -21,17 +20,5 @@ func getApp() components.App {
 }
 
 func getCommands() []components.Command {
-	printBanner()
 	return []components.Command{controller.GetAdvisory()}
-}
-
-func printBanner() {
-	println("")
-	println("")
-	pterm.DefaultBigText.WithLetters(
-		pterm.NewLettersFromStringWithStyle("JFROG ", pterm.NewStyle(pterm.FgGreen)),
-		pterm.NewLettersFromStringWithStyle("PLATFORM ADVISOR", pterm.NewStyle(pterm.FgGreen))).
-		Render()
-	println("")
-	println("")
 }

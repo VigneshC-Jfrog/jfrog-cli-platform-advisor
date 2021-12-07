@@ -11,6 +11,7 @@ import (
 	"github.com/jfrog/jfrog-cli-core/v2/utils/config"
 	"github.com/jfrog/jfrog-cli-platform-advisor/common"
 	"github.com/jfrog/jfrog-cli-platform-advisor/model"
+	"github.com/pterm/pterm"
 )
 
 var advisory_map = map[string][]model.AbstractAdvisory{
@@ -59,6 +60,7 @@ func getCommonFlags() []components.Flag {
 }
 
 func getAdvisory(c *components.Context) error {
+	printBanner()
 	if len(c.Arguments) != 1 {
 		return errors.New("Wrong number of arguments. Expected: 1, " + "Received: " + strconv.Itoa(len(c.Arguments)))
 	}
@@ -76,4 +78,15 @@ func getAdvisory(c *components.Context) error {
 		common.AddConsoleMsg("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n", "default")
 	}
 	return nil
+}
+
+func printBanner() {
+	println("")
+	println("")
+	pterm.DefaultBigText.WithLetters(
+		pterm.NewLettersFromStringWithStyle("JFROG ", pterm.NewStyle(pterm.FgGreen)),
+		pterm.NewLettersFromStringWithStyle("PLATFORM ADVISOR", pterm.NewStyle(pterm.FgGreen))).
+		Render()
+	println("")
+	println("")
 }
