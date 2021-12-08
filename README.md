@@ -18,7 +18,7 @@ Uninstalling a plugin
 ### Commands
 
 To Publish the plugin:
-* jfrog plugin publish platform-advisor 1.0.0
+* jfrog plugin publish platform-advisor v1.1.0
 
 To view the Security Advise report:
 * jfrog platform-advisor adv security
